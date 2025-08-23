@@ -13,9 +13,17 @@ run scans and view results at:
 ------------------------------------------------------
 
 1. Download the latest pursuex.zip and unzip it:
+
+
    git clone https://github.com/dipeshjatt2/pursuex
+
+
    cd pursuex 
+
+
    unzip pursuex.zip
+
+
    cd pursuex
 
 2. (Optional) Create a virtual environment:
