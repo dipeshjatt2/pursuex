@@ -25,7 +25,8 @@ run scans and view results at:
 
 3. Install required dependencies:
    pip install -r requirements.txt
-
+### for termux 
+run bash up.sh
 ------------------------------------------------------
 ▶️ Usage
 ------------------------------------------------------
