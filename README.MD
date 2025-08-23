@@ -24,17 +24,27 @@ run scans and view results at:
    unzip pursuex.zip
 
 
-   cd pursuex
+ 
 
 2. (Optional) Create a virtual environment:
+
+
    python3 -m venv venv
+
+
    source venv/bin/activate      # Linux / Mac
    venv\Scripts\activate         # Windows
 
 3. Install required dependencies:
    pip install -r requirements.txt
+
+
 ### for termux 
+
+
 run bash up.sh
+
+
 ------------------------------------------------------
 ▶️ Usage
 ------------------------------------------------------
