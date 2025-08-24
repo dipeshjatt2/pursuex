@@ -17,7 +17,16 @@ jobs:
       - name: Extract Flutter project
         run: |
           unzip pursuex_flutter_final.zip -d project
-          ls project
+          echo "Project structure after unzip:"
+          ls -R project
+
+      - name: Find project directory
+        id: project-dir
+        run: |
+          # find the folder that contains pubspec.yaml
+          dir=$(find project -name "pubspec.yaml" -exec dirname {} \; | head -n 1)
+          echo "Found Flutter project at: $dir"
+          echo "dir=$dir" >> $GITHUB_OUTPUT
 
       - name: Set up Java
         uses: actions/setup-java@v3
@@ -28,21 +37,21 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.0' # adjust if your project needs another version
+          flutter-version: '3.22.0' # adjust if needed
           channel: 'stable'
 
       - name: Install dependencies
         run: |
-          cd project/pursuex_flutter_final
+          cd ${{ steps.project-dir.outputs.dir }}
           flutter pub get
 
       - name: Build APK
         run: |
-          cd project/pursuex_flutter_final
+          cd ${{ steps.project-dir.outputs.dir }}
           flutter build apk --release
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: pursuex-release-apk
-          path: project/pursuex_flutter_final/build/app/outputs/flutter-apk/app-release.apk
+          path: ${{ steps.project-dir.outputs.dir }}/build/app/outputs/flutter-apk/app-release.apk
