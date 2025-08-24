@@ -11,10 +11,10 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.9'
 
@@ -26,25 +26,21 @@ jobs:
     - name: Initialize Buildozer
       run: buildozer init
 
-    # This section configures the buildozer.spec file
-    # for your specific Flask application.
     - name: Configure Buildozer spec
       run: |
         sed -i 's/title = Your Application/title = My Flask App/' buildozer.spec
         sed -i 's/package.name = myapp/package.name = pursuex/' buildozer.spec
         sed -i 's/package.domain = org.test/package.domain = org.example/' buildozer.spec
-        # Add your python dependencies here
         sed -i "s/# (list) Application requirements/requirements = python3,kivy,flask,gunicorn/" buildozer.spec
-        # Specify the main script to run
         sed -i 's/source.dir = .\/main.py/source.dir = ./' buildozer.spec
-        # Enable the webview component
         sed -i 's/#android.p4a.branch = master/android.p4a.branch = master/' buildozer.spec
 
     - name: Build with Buildozer
       run: buildozer -v android debug
 
     - name: Upload APK
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: android-apk
         path: bin/*.apk
+
