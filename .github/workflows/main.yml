@@ -1,0 +1,48 @@
+name: Build Flutter APK from ZIP
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Extract Flutter project
+        run: |
+          unzip pursuex_flutter_final.zip -d project
+          ls project
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.0' # adjust if your project needs another version
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: |
+          cd project/pursuex_flutter_final
+          flutter pub get
+
+      - name: Build APK
+        run: |
+          cd project/pursuex_flutter_final
+          flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: pursuex-release-apk
+          path: project/pursuex_flutter_final/build/app/outputs/flutter-apk/app-release.apk
