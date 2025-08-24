@@ -1,57 +1,50 @@
-name: Build Flutter APK from ZIP
+name: Build Android APK
 
 on:
   push:
     branches:
       - main
-  pull_request:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Extract Flutter project
-        run: |
-          unzip pursuex_flutter_final.zip -d project
-          echo "Project structure after unzip:"
-          ls -R project
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
 
-      - name: Find project directory
-        id: project-dir
-        run: |
-          # find the folder that contains pubspec.yaml
-          dir=$(find project -name "pubspec.yaml" -exec dirname {} \; | head -n 1)
-          echo "Found Flutter project at: $dir"
-          echo "dir=$dir" >> $GITHUB_OUTPUT
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install buildozer
 
-      - name: Set up Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
+    - name: Initialize Buildozer
+      run: buildozer init
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '1.22.6' # adjust if needed
-          channel: 'stable'
+    # This section configures the buildozer.spec file
+    # for your specific Flask application.
+    - name: Configure Buildozer spec
+      run: |
+        sed -i 's/title = Your Application/title = My Flask App/' buildozer.spec
+        sed -i 's/package.name = myapp/package.name = pursuex/' buildozer.spec
+        sed -i 's/package.domain = org.test/package.domain = org.example/' buildozer.spec
+        # Add your python dependencies here
+        sed -i "s/# (list) Application requirements/requirements = python3,kivy,flask,gunicorn/" buildozer.spec
+        # Specify the main script to run
+        sed -i 's/source.dir = .\/main.py/source.dir = ./' buildozer.spec
+        # Enable the webview component
+        sed -i 's/#android.p4a.branch = master/android.p4a.branch = master/' buildozer.spec
 
-      - name: Install dependencies
-        run: |
-          cd ${{ steps.project-dir.outputs.dir }}
-          flutter pub get
+    - name: Build with Buildozer
+      run: buildozer -v android debug
 
-      - name: Build APK
-        run: |
-          cd ${{ steps.project-dir.outputs.dir }}
-          flutter build apk --release
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: pursuex-release-apk
-          path: ${{ steps.project-dir.outputs.dir }}/build/app/outputs/flutter-apk/app-release.apk
+    - name: Upload APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: android-apk
+        path: bin/*.apk
