@@ -31,8 +31,9 @@ jobs:
         sed -i 's/title = Your Application/title = My Flask App/' buildozer.spec
         sed -i 's/package.name = myapp/package.name = pursuex/' buildozer.spec
         sed -i 's/package.domain = org.test/package.domain = org.example/' buildozer.spec
-        sed -i "s/# (list) Application requirements/requirements = python3,kivy,flask,gunicorn/" buildozer.spec
-        sed -i 's/source.dir = .\/main.py/source.dir = ./' buildozer.spec
+        # This command now correctly finds and replaces the requirements line
+        sed -i "s,^#?requirements\s* =.*,requirements = python3,kivy,flask,gunicorn," buildozer.spec
+        sed -i 's,^#?source.dir = .*,source.dir = .,' buildozer.spec
         sed -i 's/#android.p4a.branch = master/android.p4a.branch = master/' buildozer.spec
 
     - name: Build with Buildozer
@@ -43,4 +44,3 @@ jobs:
       with:
         name: android-apk
         path: bin/*.apk
-
